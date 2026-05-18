@@ -1,6 +1,7 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 
 Console.WriteLine("Hello, World!");
 
@@ -54,10 +55,10 @@ Console.WriteLine($"argument: {JsonConvert.SerializeObject(args)}");
 
 using (var reader = new StreamReader(_sourceFilePath))
 {
-    // Capture header to repeat in every split file
-    string header = reader.ReadLine();
+    // Capture linePointer to repeat in every split file
+    string linePointer = reader.ReadLine();
     int fileCounter = 1;
-
+    bool isFirstLine = true;
     string writeFileName = string.Empty;
     while (!reader.EndOfStream)
     {
@@ -67,13 +68,14 @@ using (var reader = new StreamReader(_sourceFilePath))
         string _destinationFilePath = Path.Combine(_sourceFileDirectory, writeFileName);
         using (var writer = new StreamWriter(_destinationFilePath))
         {
-            if (header != null) writer.WriteLine(header);
+            if (isFirstLine) writer.WriteLine(linePointer);
 
             for (int i = 0; i < rowsPerFile && !reader.EndOfStream; i++)
             {
                 writer.WriteLine(reader.ReadLine());
             }
         }
+        isFirstLine = false;
         Console.WriteLine($"Write: {writeFileName}");
     }
 }
